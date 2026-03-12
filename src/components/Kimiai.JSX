@@ -126,10 +126,9 @@ export default function KimiAI() {
     }
 
     try {
-    const res = await axios.post(
-  `${process.env.REACT_APP_API_URL}/api/chat`,
-  { messages: newMessages }
-);
+    const res = await axios.post("https://chat-bot-backend1.vercel.app/api/chat", {
+  messages: newMessages,
+});
       setMessages([...newMessages, { role: "assistant", content: res.data.reply }]);
     } catch {
       setMessages([...newMessages, { role: "assistant", content: "⚠️ Error connecting to server." }]);
