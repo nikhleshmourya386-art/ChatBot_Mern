@@ -126,7 +126,7 @@ export default function KimiAI() {
     }
 
     try {
-    const res = await axios.post("https://chat-bot-backend1.vercel.app/api/chat", {
+    const res = await axios.post("https://chat-bot-backend1.vercel.app/api", {
   messages: newMessages,
 });
       setMessages([...newMessages, { role: "assistant", content: res.data.reply }]);
