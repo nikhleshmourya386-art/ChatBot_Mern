@@ -524,14 +524,32 @@ const s = {
     background: "#020617",
     minWidth: 0,
   },
-  header: {
+ header: {
     display: "flex",
     alignItems: "center",
     gap: 10,
     padding: "0 16px",
     height: 58,
     flexShrink: 0,
+    position: "sticky",   // ← pins to top of scroll container
+    top: 0,
+    zIndex: 10,
+    background: "#020617", // ← must match main bg so content doesn't bleed through
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)",
   },
+    main: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    height: "100svh",
+    overflow: "hidden",    // ← keep this so only messageArea scrolls
+    background: "#020617",
+    minWidth: 0,
+    isolation: "isolate",  // ← creates stacking context so header z-index works
+  },
+
+
   hamburger: {
     background: "transparent",
     border: "none",
@@ -578,10 +596,13 @@ const s = {
     whiteSpace: "nowrap",
     flexShrink: 0,
   },
-  headerLine: {
+headerLine: {
     height: 1,
     background: "linear-gradient(90deg,#22c55e33,#3b82f633,transparent)",
     flexShrink: 0,
+    position: "sticky",
+    top: 58,
+    zIndex: 9,
   },
   messageArea: {
     flex: 1,
