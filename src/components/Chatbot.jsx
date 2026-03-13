@@ -300,41 +300,40 @@ export default function KimiAI() {
 
           {/* Messages */}
           <div style={s.messageArea}>
-            {messages.map((msg, i) => (
-              <div
-                key={i}
-                style={{
-                  ...s.msgRow,
-                  justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
-                  animationDelay: `${Math.min(i * 0.04, 0.3)}s`,
-                }}
-              >
-                {msg.role === "assistant" && (
-                  <div style={{ ...s.avatar, width: isMobile ? 28 : 32, height: isMobile ? 28 : 32 }}>⬡</div>
-                )}
-                <div style={{
-                  ...(msg.role === "user" ? s.userBubble : s.botBubble),
-                  maxWidth: isMobile ? "82%" : "62%",
-                  fontSize: isMobile ? 13 : 14,
-                }}>
-                  {msg.content}
-                </div>
-                {msg.role === "user" && (
-                  <div style={{ ...s.userAvatar, width: isMobile ? 28 : 32, height: isMobile ? 28 : 32 }}>U</div>
-                )}
-              </div>
-            ))}
+            {/* Normal messages */}
+{messages.map((msg, i) => (
+  <div key={i} style={{
+    ...s.msgRow,
+    justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+    animationDelay: `${Math.min(i * 0.04, 0.3)}s`,
+  }}>
+    {msg.role === "assistant" && (
+      <div style={{ ...s.avatar, width: isMobile ? 28 : 32, height: isMobile ? 28 : 32 }}>⬡</div>
+    )}
+    <div style={{
+      ...(msg.role === "user" ? s.userBubble : s.botBubble),  // ← normal botBubble, no flex
+      maxWidth: isMobile ? "80%" : "62%",
+      fontSize: isMobile ? 14 : 14,
+    }}>
+      {msg.content}
+    </div>
+    {msg.role === "user" && (
+      <div style={{ ...s.userAvatar, width: isMobile ? 28 : 32, height: isMobile ? 28 : 32 }}>U</div>
+    )}
+  </div>
+))}
 
-            {isLoading && (
-              <div style={{ ...s.msgRow, justifyContent: "flex-start" }}>
-                <div style={s.avatar}>⬡</div>
-                <div style={s.botBubble}>
-                  {[0, 0.2, 0.4].map((d, i) => (
-                    <span key={i} style={{ ...s.dot, animationDelay: `${d}s` }} />
-                  ))}
-                </div>
-              </div>
-            )}
+{/* Loading dots — uses the flex variant */}
+{isLoading && (
+  <div style={{ ...s.msgRow, justifyContent: "flex-start" }}>
+    <div style={s.avatar}>⬡</div>
+    <div style={s.botBubbleLoading}>   {/* ← loading-only bubble */}
+      {[0, 0.2, 0.4].map((d, i) => (
+        <span key={i} style={{ ...s.dot, animationDelay: `${d}s` }} />
+      ))}
+    </div>
+  </div>
+)}
             <div ref={messagesEndRef} />
           </div>
 
@@ -525,19 +524,21 @@ const s = {
     minWidth: 0,
   },
  header: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    padding: "0 16px",
-    height: 58,
-    flexShrink: 0,
-    position: "sticky",   // ← pins to top of scroll container
-    top: 0,
-    zIndex: 10,
-    background: "#020617", // ← must match main bg so content doesn't bleed through
-    backdropFilter: "blur(12px)",
-    WebkitBackdropFilter: "blur(12px)",
-  },
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  padding: "0 16px",
+  height: 58,
+  flexShrink: 0,
+  position: "sticky",
+  top: 0,
+  zIndex: 10,
+  background: "rgba(2, 6, 23, 0.95)",   // ← slightly transparent dark
+  backdropFilter: "blur(16px)",
+  WebkitBackdropFilter: "blur(16px)",
+  borderBottom: "1px solid #0f2040",    // ← visible separator
+  boxShadow: "0 2px 20px #00000060",    // ← depth so it reads as "above"
+},
     main: {
     flex: 1,
     display: "flex",
@@ -642,15 +643,43 @@ headerLine: {
     wordBreak: "break-word",
     whiteSpace: "pre-wrap",
   },
-  botBubble: {
-    padding: "10px 14px",
-    borderRadius: "16px 16px 16px 4px",
-    background: "#0f1f35", border: "1px solid #1e3a5f",
-    color: "#cbd5e1", lineHeight: 1.6,
-    fontFamily: "'JetBrains Mono', monospace",
-    display: "flex", alignItems: "center", gap: 6,
-    wordBreak: "break-word", whiteSpace: "pre-wrap",
-  },
+// 1. Split botBubble into two variants
+botBubble: {
+  padding: "10px 14px",
+  borderRadius: "16px 16px 16px 4px",
+  background: "#0f1f35",
+  border: "1px solid #1e3a5f",
+  color: "#cbd5e1",
+  lineHeight: 1.7,
+  fontFamily: "'Syne', sans-serif",   // ← readable, not monospace
+  fontSize: 14,
+  wordBreak: "break-word",
+  whiteSpace: "pre-wrap",
+  // ← REMOVED display:flex — that was breaking text layout
+},
+
+botBubbleLoading: {
+  padding: "12px 16px",
+  borderRadius: "16px 16px 16px 4px",
+  background: "#0f1f35",
+  border: "1px solid #1e3a5f",
+  display: "flex",                    // ← flex only for the dot loader
+  alignItems: "center",
+  gap: 6,
+},
+
+userBubble: {
+  padding: "10px 14px",
+  borderRadius: "16px 16px 4px 16px",
+  background: "linear-gradient(135deg,#2563eb,#1d4ed8)",
+  color: "#fff",
+  lineHeight: 1.7,
+  fontFamily: "'Syne', sans-serif",   // ← match bot bubble font
+  boxShadow: "0 4px 16px #2563eb33",
+  wordBreak: "break-word",
+  whiteSpace: "pre-wrap",
+},
+
   dot: {
     display: "inline-block", width: 7, height: 7,
     borderRadius: "50%", background: "#22c55e",
